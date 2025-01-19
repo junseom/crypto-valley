@@ -2,8 +2,11 @@
 
 import styled from "styled-components";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation"; // Next.js 라우팅
 
 const InformationValidation = () => {
+    const router = useRouter(); // useRouter 사용
+
     const [progress, setProgress] = useState(50);
     const [likeCount, setLikeCount] = useState(855); // 초기 좋아요 카운트 설정
     const [dislikeCount, setDislikeCount] = useState(811); // 초기 싫어요 카운트 설정
@@ -38,7 +41,7 @@ const InformationValidation = () => {
                         <Progress style={{ width: `${progress}%` }} />
                     </ProgressBar>
                 </InfoGroup>
-                
+
                 <TextArea
                     rows={4}
                     placeholder="Rate and validate the following information"
@@ -54,7 +57,9 @@ const InformationValidation = () => {
                 </ButtonGroup>
 
                 <ActionGroup>
-                    <ActionButton>Cancel</ActionButton>
+                    <ActionButton onClick={() => router.push("/home")}>
+                        Cancel
+                    </ActionButton>
                     <ActionButton isprimary="true">Vote</ActionButton>
                 </ActionGroup>
             </ContentBox>

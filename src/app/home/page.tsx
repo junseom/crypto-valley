@@ -1,12 +1,21 @@
-'use client'
+'use client';
 
 import React from "react";
 import { useRouter } from "next/navigation";
 
+// Token 타입 정의
+interface Token {
+  name: string;
+  amount: string;
+  value: string;
+  icon: string;
+  hasAccess: boolean;
+}
+
 const TokenListPage = () => {
   const router = useRouter();
 
-  const tokens = [
+  const tokens: Token[] = [
     { name: "Bitcoin", amount: "0.1 BTC", value: "$6,000", icon: "/icons/bitcoin.png", hasAccess: true },
     { name: "Ethereum", amount: "0.1 ETH", value: "$3,000", icon: "/icons/ethereum.png", hasAccess: true },
     { name: "CryptoVest Token", amount: "0.1 CVT", value: "$3,000", icon: "/icons/cryptovest.png", hasAccess: false },
@@ -15,8 +24,12 @@ const TokenListPage = () => {
     { name: "Solana", amount: "0.1 SOL", value: "$3,000", icon: "/icons/solana.png", hasAccess: false },
   ];
 
-  const handleTokenClick = (token) => {
-    if (!token.hasAccess) {
+  const handleTokenClick = (token: Token) => {
+    if (token.name === "Bitcoin") {
+      router.push("/chart/bitcoin");
+    } else if (token.name === "Ethereum") {
+      router.push("/chart/ethereum");
+    } else if (!token.hasAccess) {
       router.push("/purchase");
     }
   };
