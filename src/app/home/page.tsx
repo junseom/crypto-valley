@@ -46,7 +46,7 @@ const TokenListPage = () => {
       symbol: "XRP",
       amount: "0.1 CVT",
       value: "2",
-      icon: "/icons/cryptovest.png",
+      icon: "/icons/a.png",
       hasAccess: false,
     },
     {
@@ -54,7 +54,7 @@ const TokenListPage = () => {
       symbol: "DOGE",
       amount: "0.1 DOGE",
       value: "2",
-      icon: "/icons/dogecoin.png",
+      icon: "/icons/doge.png",
       hasAccess: false,
     },
     {
@@ -70,7 +70,7 @@ const TokenListPage = () => {
       symbol: "ADA",
       amount: "0.1 ADA",
       value: "2",
-      icon: "/icons/cardano.png",
+      icon: "/icons/ada.png",
       hasAccess: false,
     },
   ]);
