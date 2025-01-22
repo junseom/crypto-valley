@@ -1,241 +1,250 @@
-'use client';
+"use client";
 
 import styled from "styled-components";
 import React, { useState } from "react";
+import { addOpinion } from "@/states/opinions.state";
+import { useRouter } from "next/navigation";
+import { getSigner } from "@dynamic-labs/ethers-v6";
+import SEPOLIA_CONTRACTS from "@/configs/sepolia";
+import { CV__factory } from "@/typechain";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 
-interface FormData {
-    sourceType: string;
-    title: string;
-    content: string;
-    link: string;
-    originalContentLink: string;
-    file: File | null;
+// Opinion 타입 정의
+interface Opinion {
+  id: number;
+  cause: string;
+  effect: string;
+  content: string;
+  sourceType: string;
+  link: string;
 }
 
 const SubmitForm = () => {
-    const [formData, setFormData] = useState<FormData>({
-        sourceType: "",
-        title: "",
-        content: "",
-        link: "",
-        originalContentLink: "",
-        file: null,
+  const router = useRouter();
+  const { primaryWallet } = useDynamicContext();
+  const [formData, setFormData] = useState<Opinion>({
+    id: 0,
+    cause: "",
+    effect: "",
+    content: "",
+    sourceType: "",
+    link: "",
+  });
+
+  const handleInputChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = event.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleSourceButtonClick = (type: string) => {
+    console.log("SourceButton clicked:", type);
+    setFormData((prevData) => ({
+      ...prevData,
+      sourceType: prevData.sourceType === type ? "" : type, // 다시 클릭 시 취소
+    }));
+    console.log("handleSourceButtonClick:", formData.sourceType);
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    console.log("Form submitted:", formData);
+    console.log("Contract execution started");
+
+    const signer = await getSigner(primaryWallet!);
+    const cv = CV__factory.connect(SEPOLIA_CONTRACTS.CV, signer);
+    const tx = await cv.submitOption("DOGE", formData.content);
+    await tx.wait();
+
+    addOpinion({
+      ...formData,
     });
 
-    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = event.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
-    };
+    router.back();
+  };
 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files ? event.target.files[0] : null;
-        setFormData((prevData) => ({
-            ...prevData,
-            file: file,
-        }));
-    };
+  return (
+    <Container>
+      <Form onSubmit={handleSubmit}>
+        <Heading>Submit your opinion</Heading>
 
-    const handleSourceButtonClick = (type: string) => {
-        setFormData((prevData) => ({
-            ...prevData,
-            sourceType: prevData.sourceType === type ? "" : type, // 다시 클릭 시 취소
-        }));
-    };
+        <InputGroup>
+          <Label>Source Type</Label>
+          <ButtonGroup>
+            {["News", "Tweet", "Article", "Video", "Podcast", "Other"].map(
+              (type) => (
+                <SourceButton
+                  key={type}
+                  active={formData.sourceType === type}
+                  type="button"
+                  onClick={() => handleSourceButtonClick(type)}
+                >
+                  {type}
+                </SourceButton>
+              )
+            )}
+          </ButtonGroup>
+        </InputGroup>
 
-    const handleSubmit = (event: React.FormEvent) => {
-        event.preventDefault();
-        console.log("Form submitted:", formData);
-    };
+        <InputGroup>
+          <Label htmlFor="cause">Cause</Label>
+          <Input
+            type="text"
+            id="cause"
+            name="cause"
+            value={formData.cause}
+            onChange={handleInputChange}
+            placeholder="Enter cause"
+          />
+        </InputGroup>
 
-    return (
-        <Container>
-            <Form onSubmit={handleSubmit}>
-                <Heading>Submit</Heading>
+        <InputGroup>
+          <Label htmlFor="effect">Effect</Label>
+          <Input
+            type="text"
+            id="effect"
+            name="effect"
+            value={formData.effect}
+            onChange={handleInputChange}
+            placeholder="Enter effect"
+          />
+        </InputGroup>
 
-                <InputGroup>
-                    <Label>Source Type</Label>
-                    <ButtonGroup>
-                        {["News", "Tweet", "Article", "Video", "Podcast", "Other"].map((type) => (
-                            <SourceButton
-                                key={type}
-                                active={formData.sourceType === type} // 'active' 속성은 styled-components에서만 사용됨
-                                onClick={() => handleSourceButtonClick(type)}
-                            >
-                                {type}
-                            </SourceButton>
-                        ))}
-                    </ButtonGroup>
-                </InputGroup>
+        <InputGroup>
+          <Label htmlFor="content">Content</Label>
+          <TextArea
+            id="content"
+            name="content"
+            value={formData.content}
+            onChange={handleInputChange}
+            placeholder="Enter content"
+          />
+        </InputGroup>
 
-                <InputGroup>
-                    <Label htmlFor="title">Title</Label>
-                    <Input
-                        type="text"
-                        id="title"
-                        name="title"
-                        value={formData.title}
-                        onChange={handleInputChange}
-                        placeholder="Enter title"
-                    />
-                </InputGroup>
+        <InputGroup>
+          <Label htmlFor="link">Link</Label>
+          <Input
+            type="url"
+            id="link"
+            name="link"
+            value={formData.link}
+            onChange={handleInputChange}
+            placeholder="https://"
+          />
+        </InputGroup>
 
-                <InputGroup>
-                    <Label htmlFor="content">Content</Label>
-                    <TextArea
-                        id="content"
-                        name="content"
-                        value={formData.content}
-                        onChange={handleInputChange}
-                        placeholder="Enter content"
-                    />
-                </InputGroup>
-
-                <InputGroup>
-                    <Label htmlFor="link">Link</Label>
-                    <Input
-                        type="url"
-                        id="link"
-                        name="link"
-                        value={formData.link}
-                        onChange={handleInputChange}
-                        placeholder="https://"
-                    />
-                </InputGroup>
-
-                <InputGroup>
-                    <Label htmlFor="file">Upload File</Label>
-                    <Input
-                        type="file"
-                        id="file"
-                        name="file"
-                        onChange={handleFileChange}
-                    />
-                </InputGroup>
-
-                <InputGroup>
-                    <Label htmlFor="originalContentLink">Source Verification</Label>
-                    <Input
-                        type="url"
-                        id="originalContentLink"
-                        name="originalContentLink"
-                        value={formData.originalContentLink}
-                        onChange={handleInputChange}
-                        placeholder="https://"
-                    />
-                </InputGroup>
-
-                <SubmitButton type="submit">Submit</SubmitButton>
-            </Form>
-        </Container>
-    );
+        <SubmitButton type="submit">Submit</SubmitButton>
+      </Form>
+    </Container>
+  );
 };
 
 export default SubmitForm;
 
 // Styled components
 const Container = styled.div`
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 100vw;
-    height: 100vh;
-    background-color: #000000;
-    color: #ffffff;
-    overflow: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #000000;
+  color: #ffffff;
+  overflow: auto;
 `;
 
 const Form = styled.form`
-    display: flex;
-    flex-direction: column;
-    width: 90%;
-    max-width: 600px;
-    padding: 20px;
-    background-color: #000000;
-    border-radius: 8px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+  max-width: 600px;
+  padding: 20px;
+  background-color: #000000;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+  margin: 0 auto;
 `;
 
 const Heading = styled.h1`
-    font-size: 30px;
-    text-align: center;
-    margin-bottom: 20px;
-    color: #ffffff;
-    font-weight: bold;
+  font-size: 30px;
+  text-align: center;
+  margin-bottom: 20px;
+  color: #ffffff;
+  font-weight: bold;
 `;
 
 const InputGroup = styled.div`
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 `;
 
 const Label = styled.label`
-    display: block;
-    margin-bottom: 8px;
-    font-weight: bold;
-    color: #ffffff;
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #ffffff;
 `;
 
 const Input = styled.input`
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-    background-color: #333333;
-    color: #ffffff;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  background-color: #333333;
+  color: #ffffff;
 `;
 
 const TextArea = styled.textarea`
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-    background-color: #333333;
-    color: #ffffff;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  background-color: #333333;
+  color: #ffffff;
 `;
 
 const ButtonGroup = styled.div`
-    display: flex;
-    gap: 10px;
+  display: flex;
+  gap: 10px;
 `;
 
 interface SourceButtonProps {
-    active: boolean;
+  active: boolean;
 }
 
 const SourceButton = styled.button.withConfig({
-    shouldForwardProp: (prop) => prop !== "active", // active 속성을 DOM으로 전달하지 않음
+  shouldForwardProp: (prop) => prop !== "active", // active 속성을 DOM으로 전달하지 않음
 })<SourceButtonProps>`
-    padding: 10px;
-    border: 1px solid #ffffff;
-    border-radius: 4px;
-    background-color: ${(props) => (props.active ? "#0056b3" : "#000000")};
-    color: white;
-    cursor: pointer;
-    font-weight: bold;
+  padding: 10px;
+  border: 1px solid #ffffff;
+  border-radius: 4px;
+  background-color: ${(props) => (props.active ? "#646b71" : "#000000")};
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
 
-    &:hover {
-        background-color: #0056b3;
-    }
+  &:hover {
+    background-color: #0056b3;
+  }
 `;
 
-
 const SubmitButton = styled.button`
-    width: 100%;
-    padding: 10px;
-    border: none;
-    border-radius: 4px;
-    background-color: #007bff;
-    color: white;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  background-color: white;
+  color: black;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
 
-    &:hover {
-        background-color: #0056b3;
-    }
+  &:hover {
+    background-color: rgb(191, 190, 190);
+  }
 `;

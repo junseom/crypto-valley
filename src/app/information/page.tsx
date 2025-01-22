@@ -3,6 +3,10 @@
 import styled from "styled-components";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation"; // Next.js 라우팅
+import { getSigner } from "@dynamic-labs/ethers-v6";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { CV__factory } from "@/typechain";
+import SEPOLIA_CONTRACTS from "@/configs/sepolia";
 
 const InformationValidation = () => {
     const router = useRouter(); // useRouter 사용
@@ -11,8 +15,16 @@ const InformationValidation = () => {
     const [likeCount, setLikeCount] = useState(855); // 초기 좋아요 카운트 설정
     const [dislikeCount, setDislikeCount] = useState(811); // 초기 싫어요 카운트 설정
     const [totalVotes, setTotalVotes] = useState(likeCount + dislikeCount);
+    const [isVoted, setIsVoted] = useState(false);
+    const { primaryWallet } = useDynamicContext();
 
-    const handleVote = (islike: boolean) => {
+    const handleVote = async (islike: boolean) => {
+        const signer = await getSigner(primaryWallet!);
+
+        const cv = CV__factory.connect(SEPOLIA_CONTRACTS.CV, signer);
+        const tx = await cv.addVote("DOGE", islike);
+        await tx.wait();
+
         const newTotalVotes = totalVotes + 1;
         if (islike) {
             setLikeCount(likeCount + 1); // 좋아요 카운트 증가
@@ -20,6 +32,7 @@ const InformationValidation = () => {
             setDislikeCount(dislikeCount + 1); // 싫어요 카운트 증가
         }
         setTotalVotes(newTotalVotes); // 총 투표수 증가
+        setIsVoted(true); // 투표 완료 상태로 변경
     };
 
     const likePercentage = (likeCount / totalVotes) * 100; // 좋아요 비율 계산
@@ -48,19 +61,18 @@ const InformationValidation = () => {
                 />
 
                 <ButtonGroup>
-                    <VoteButton onClick={() => handleVote(true)} islike="true">
+                    <VoteButton onClick={() => handleVote(true)} islike="true" disabled={isVoted}>
                         👍 {Math.round(likePercentage)}% ({likeCount})
                     </VoteButton>
-                    <VoteButton onClick={() => handleVote(false)} islike="false">
+                    <VoteButton onClick={() => handleVote(false)} islike="false" disabled={isVoted}>
                         👎 {Math.round(dislikePercentage)}% ({dislikeCount})
                     </VoteButton>
                 </ButtonGroup>
 
                 <ActionGroup>
-                    <ActionButton onClick={() => router.push("/home")}>
-                        Cancel
+                    <ActionButton onClick={() => router.back()}>
+                        Close
                     </ActionButton>
-                    <ActionButton isprimary="true">Vote</ActionButton>
                 </ActionGroup>
             </ContentBox>
         </Container>

@@ -38,6 +38,7 @@ export interface CVInterface extends Interface {
       | "lastupdated"
       | "name"
       | "owner"
+      | "submitCount"
       | "submitOption"
       | "subscribe"
       | "symbol"
@@ -46,6 +47,7 @@ export interface CVInterface extends Interface {
       | "totalSupply"
       | "transfer"
       | "transferFrom"
+      | "voteCount"
   ): FunctionFragment;
 
   getEvent(
@@ -63,7 +65,7 @@ export interface CVInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "addVote",
-    values: [string, BytesLike, boolean]
+    values: [string, boolean]
   ): string;
   encodeFunctionData(
     functionFragment: "addtoken",
@@ -84,7 +86,7 @@ export interface CVInterface extends Interface {
   encodeFunctionData(functionFragment: "decimals", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "distributeRewards",
-    values: [string, BytesLike]
+    values: [string]
   ): string;
   encodeFunctionData(
     functionFragment: "initDuration",
@@ -96,6 +98,10 @@ export interface CVInterface extends Interface {
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "submitCount",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "submitOption",
     values: [string, string]
@@ -122,6 +128,7 @@ export interface CVInterface extends Interface {
     functionFragment: "transferFrom",
     values: [AddressLike, AddressLike, BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "voteCount", values?: undefined): string;
 
   decodeFunctionResult(
     functionFragment: "Subscribers",
@@ -148,6 +155,10 @@ export interface CVInterface extends Interface {
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "submitCount",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "submitOption",
     data: BytesLike
   ): Result;
@@ -170,6 +181,7 @@ export interface CVInterface extends Interface {
     functionFragment: "transferFrom",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "voteCount", data: BytesLike): Result;
 }
 
 export namespace ApprovalEvent {
@@ -236,13 +248,13 @@ export namespace TransferEvent {
 
 export namespace VotedEvent {
   export type InputTuple = [
-    optionHash: BytesLike,
+    voteCount: BigNumberish,
     voter: AddressLike,
     like: boolean
   ];
-  export type OutputTuple = [optionHash: string, voter: string, like: boolean];
+  export type OutputTuple = [voteCount: bigint, voter: string, like: boolean];
   export interface OutputObject {
-    optionHash: string;
+    voteCount: bigint;
     voter: string;
     like: boolean;
   }
@@ -302,7 +314,7 @@ export interface CV extends BaseContract {
   >;
 
   addVote: TypedContractMethod<
-    [tokenType: string, dataHash: BytesLike, _like: boolean],
+    [tokenType: string, _like: boolean],
     [void],
     "nonpayable"
   >;
@@ -330,7 +342,7 @@ export interface CV extends BaseContract {
   decimals: TypedContractMethod<[], [bigint], "view">;
 
   distributeRewards: TypedContractMethod<
-    [tokenType: string, dataHash: BytesLike],
+    [tokenType: string],
     [void],
     "nonpayable"
   >;
@@ -343,9 +355,11 @@ export interface CV extends BaseContract {
 
   owner: TypedContractMethod<[], [string], "view">;
 
+  submitCount: TypedContractMethod<[], [bigint], "view">;
+
   submitOption: TypedContractMethod<
     [tokenType: string, _data: string],
-    [string],
+    [void],
     "nonpayable"
   >;
 
@@ -371,6 +385,8 @@ export interface CV extends BaseContract {
     "nonpayable"
   >;
 
+  voteCount: TypedContractMethod<[], [bigint], "view">;
+
   getFunction<T extends ContractMethod = ContractMethod>(
     key: string | FunctionFragment
   ): T;
@@ -385,7 +401,7 @@ export interface CV extends BaseContract {
   getFunction(
     nameOrSignature: "addVote"
   ): TypedContractMethod<
-    [tokenType: string, dataHash: BytesLike, _like: boolean],
+    [tokenType: string, _like: boolean],
     [void],
     "nonpayable"
   >;
@@ -418,11 +434,7 @@ export interface CV extends BaseContract {
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "distributeRewards"
-  ): TypedContractMethod<
-    [tokenType: string, dataHash: BytesLike],
-    [void],
-    "nonpayable"
-  >;
+  ): TypedContractMethod<[tokenType: string], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "initDuration"
   ): TypedContractMethod<[], [void], "nonpayable">;
@@ -436,10 +448,13 @@ export interface CV extends BaseContract {
     nameOrSignature: "owner"
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
+    nameOrSignature: "submitCount"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
     nameOrSignature: "submitOption"
   ): TypedContractMethod<
     [tokenType: string, _data: string],
-    [string],
+    [void],
     "nonpayable"
   >;
   getFunction(
@@ -471,6 +486,9 @@ export interface CV extends BaseContract {
     [boolean],
     "nonpayable"
   >;
+  getFunction(
+    nameOrSignature: "voteCount"
+  ): TypedContractMethod<[], [bigint], "view">;
 
   getEvent(
     key: "Approval"
@@ -553,7 +571,7 @@ export interface CV extends BaseContract {
       TransferEvent.OutputObject
     >;
 
-    "Voted(bytes32,address,bool)": TypedContractEvent<
+    "Voted(uint256,address,bool)": TypedContractEvent<
       VotedEvent.InputTuple,
       VotedEvent.OutputTuple,
       VotedEvent.OutputObject

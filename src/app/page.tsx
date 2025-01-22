@@ -12,8 +12,9 @@ export default function Page() {
   const handleWalletConnect = () => {
     if (!isLoggedIn) {
       setShowAuthFlow(true);
+    } else {
+      router.push("/home");
     }
-    router.push("/home");
   };
 
   return (

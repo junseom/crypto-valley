@@ -226,7 +226,7 @@ const TokenListPage = () => {
                 </button>
               ) : (
                 <button
-                  className="bg-white px-4 py-2 w-full rounded text-black hover:bg-gray-200"
+                  className="bg-blue-500 px-4 py-2 w-full rounded text-white hover:bg-gray-200"
                   onClick={onConfirm}
                 >
                   Confirm Purchase

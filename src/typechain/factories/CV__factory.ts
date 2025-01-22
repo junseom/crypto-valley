@@ -56,11 +56,6 @@ const _abi = [
         internalType: "string",
       },
       {
-        name: "dataHash",
-        type: "bytes32",
-        internalType: "bytes32",
-      },
-      {
         name: "_like",
         type: "bool",
         internalType: "bool",
@@ -176,11 +171,6 @@ const _abi = [
         type: "string",
         internalType: "string",
       },
-      {
-        name: "dataHash",
-        type: "bytes32",
-        internalType: "bytes32",
-      },
     ],
     outputs: [],
     stateMutability: "nonpayable",
@@ -233,6 +223,19 @@ const _abi = [
   },
   {
     type: "function",
+    name: "submitCount",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "submitOption",
     inputs: [
       {
@@ -246,13 +249,7 @@ const _abi = [
         internalType: "string",
       },
     ],
-    outputs: [
-      {
-        name: "",
-        type: "bytes32",
-        internalType: "bytes32",
-      },
-    ],
+    outputs: [],
     stateMutability: "nonpayable",
   },
   {
@@ -380,6 +377,19 @@ const _abi = [
     stateMutability: "nonpayable",
   },
   {
+    type: "function",
+    name: "voteCount",
+    inputs: [],
+    outputs: [
+      {
+        name: "",
+        type: "uint256",
+        internalType: "uint256",
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
     type: "event",
     name: "Approval",
     inputs: [
@@ -472,10 +482,10 @@ const _abi = [
     name: "Voted",
     inputs: [
       {
-        name: "optionHash",
-        type: "bytes32",
+        name: "voteCount",
+        type: "uint256",
         indexed: true,
-        internalType: "bytes32",
+        internalType: "uint256",
       },
       {
         name: "voter",
