@@ -1,0 +1,6 @@
+const SEPOLIA_CONTRACTS = {
+    CV: "0x2fBB22fdD7dCFC31E407567A5DefBEfE109e5769",
+  };
+  
+  export default SEPOLIA_CONTRACTS;
+  

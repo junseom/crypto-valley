@@ -1,41 +1,16 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 
 export default function Profile() {
   const router = useRouter();
-  const [walletAddress, setWalletAddress] = useState<string | null>(null);
+  const { handleLogOut, primaryWallet } = useDynamicContext();
 
-  useEffect(() => {
-    const fetchWalletAddress = async () => {
-      try {
-        // @ts-ignore - ethereum이 window 객체에 있다고 가정
-        const ethereum = window.ethereum;
 
-        if (!ethereum) {
-          alert('MetaMask를 설치해주세요!');
-          return;
-        }
-
-        const accounts = await ethereum.request({ method: 'eth_accounts' });
-        if (accounts && accounts.length > 0) {
-          setWalletAddress(accounts[0]);
-        } else {
-          setWalletAddress(null);
-        }
-      } catch (error) {
-        console.error('지갑 주소를 가져오는 중 오류 발생:', error);
-        setWalletAddress(null);
-      }
-    };
-
-    fetchWalletAddress();
-  }, []);
 
   const disconnectWallet = () => {
-    alert('지갑 연결이 해제되었습니다.');
-    setWalletAddress(null); // 지갑 주소 초기화
+    handleLogOut();
     router.push('/');
   };
 
@@ -71,7 +46,7 @@ export default function Profile() {
             <div className="ml-4">
               <h1 className="text-2xl font-bold">{user.username}</h1>
               <p className="text-sm text-gray-400">
-                {walletAddress ? walletAddress : 'No Wallet Connected'}
+                {primaryWallet ? primaryWallet.address : 'No Wallet Connected'}
               </p>
             </div>
           </div>
@@ -79,7 +54,7 @@ export default function Profile() {
             onClick={disconnectWallet}
             className="bg-red-500 px-4 py-2 rounded-md font-semibold hover:bg-red-600 transition duration-300"
           >
-            Disconnect Wallet
+            Log Out
           </button>
         </div>
 
