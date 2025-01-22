@@ -111,6 +111,8 @@ const TokenListPage = () => {
     );
 
     const tx = await cv.subscribe(selectedToken!.symbol);
+    console.log(selectedToken);
+    console.log(tx);
     await tx.wait();
     setTokens((prevTokens) =>
       prevTokens.map((token) =>
