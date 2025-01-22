@@ -7,8 +7,6 @@ export default function Profile() {
   const router = useRouter();
   const { handleLogOut, primaryWallet } = useDynamicContext();
 
-
-
   const disconnectWallet = () => {
     handleLogOut();
     router.push('/');

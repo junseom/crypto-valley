@@ -10,26 +10,30 @@ export default function Page() {
   const isLoggedIn = useIsLoggedIn();
 
   const handleWalletConnect = () => {
-    if (isLoggedIn) {
-      router.push("/home");
-    } else {
+    if (!isLoggedIn) {
       setShowAuthFlow(true);
     }
+    router.push("/home");
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <main className="flex flex-col items-center px-6 py-12">
-        <h1 className="text-3xl font-bold mb-4">Welcome to CryptoValley</h1>
-        <p className="text-gray-400 mb-6 text-center">
+    <div
+      className="min-h-screen bg-black bg-cover bg-center"
+      style={{
+        backgroundImage: "url('/chart.jpg')",
+      }}
+    >
+      <main className="flex flex-col gap-2 items-center px-6 py-32">
+        <h1 className="text-5xl font-bold mb-4">Welcome to CryptoValley</h1>
+        <p className="text-gray-400 mb-6 text-xl text-center">
           CryptoValley is a place to search chart information
         </p>
 
         <button
           onClick={handleWalletConnect}
-          className="w-64 h-12 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition duration-300 disabled:opacity-50"
+          className="w-64 h-12 bg-white text-black font-semibold text-black rounded-lg hover:bg-gray-300"
         >
-          Connect wallet
+          Login with Wallet
         </button>
 
         <p className="text-gray-500 text-sm mt-4 text-center">

@@ -1,9 +1,8 @@
 'use client';
 
-import React from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
-// Token 타입 정의
 interface Token {
   name: string;
   amount: string;
@@ -14,24 +13,30 @@ interface Token {
 
 const TokenListPage = () => {
   const router = useRouter();
+  const [selectedToken, setSelectedToken] = useState<Token | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const tokens: Token[] = [
     { name: "Bitcoin", amount: "0.1 BTC", value: "$6,000", icon: "/icons/bitcoin.png", hasAccess: true },
     { name: "Ethereum", amount: "0.1 ETH", value: "$3,000", icon: "/icons/ethereum.png", hasAccess: true },
-    { name: "CryptoVest Token", amount: "0.1 CVT", value: "$3,000", icon: "/icons/cryptovest.png", hasAccess: false },
+    { name: "XRPL", amount: "0.1 CVT", value: "$3,000", icon: "/icons/cryptovest.png", hasAccess: false },
     { name: "Dogecoin", amount: "0.1 DOGE", value: "$3,000", icon: "/icons/dogecoin.png", hasAccess: false },
-    { name: "Cardano", amount: "0.1 ADA", value: "$3,000", icon: "/icons/cardano.png", hasAccess: false },
     { name: "Solana", amount: "0.1 SOL", value: "$3,000", icon: "/icons/solana.png", hasAccess: false },
+    { name: "Cardano", amount: "0.1 ADA", value: "$3,000", icon: "/icons/cardano.png", hasAccess: false },
   ];
 
   const handleTokenClick = (token: Token) => {
-    if (token.name === "Bitcoin") {
-      router.push("/chart/bitcoin");
-    } else if (token.name === "Ethereum") {
-      router.push("/chart/ethereum");
-    } else if (!token.hasAccess) {
-      router.push("/purchase");
+    if (token.hasAccess) {
+      router.push(`/chart/${token.name}`);
+    } else {
+      setSelectedToken(token);
+      setIsModalOpen(true);
     }
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedToken(null);
   };
 
   return (
@@ -64,6 +69,57 @@ const TokenListPage = () => {
           </li>
         ))}
       </ul>
+
+      {/* 모달 */}
+      {isModalOpen && selectedToken && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div 
+            className="absolute bg-gray-900 p-8 rounded shadow-lg max-w-2xl w-full"
+            style={{top: "10%"}}
+          >
+            <h2 className="text-xl font-semibold text-white mb-4">Unlock detailed charts</h2>
+            <p className="text-gray-400 mb-4">
+              Get access to our in-depth charting tools by purchasing $1,000 CV Tokens.
+            </p>
+            <div className="mb-6">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="bg-gray-800 p-4 rounded">
+                  <img src="/icons/wallet.png" alt="Wallet Icon" className="w-8 h-8" />
+                </div>
+                <div>
+                  <p className="text-gray-300">Token Balance</p>
+                  <p className="text-sm text-gray-400">Your current balance is 0 CV Tokens</p>
+                  <p className="text-sm text-gray-500">You will be charged 1,000 $CV Token</p>
+                  <p className="text-sm text-gray-500">Subscription Period: 24.09.01 ~ 24.10.01</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="bg-gray-800 p-4 rounded">
+                  <img src="/icons/lock.png" alt="Lock Icon" className="w-8 h-8" />
+                </div>
+                <div>
+                  <p className="text-gray-300">Chart Access</p>
+                  <p className="text-sm text-gray-400">This will unlock detailed charts for 1 year</p>
+                </div>
+              </div>
+            </div>
+            <div className="flex gap-8 justify-evenly">
+              <button
+                className="bg-gray-800 px-4 py-2 w-full rounded text-gray-300 hover:bg-gray-700"
+                onClick={closeModal}
+              >
+                Close
+              </button>
+              <button
+                className="bg-white px-4 py-2 w-full rounded text-black hover:bg-gray-200"
+                onClick={closeModal}
+              >
+                Confirm Purchase
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
