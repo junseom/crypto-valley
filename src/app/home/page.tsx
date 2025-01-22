@@ -1,10 +1,16 @@
-'use client';
+"use client";
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { getSigner } from "@dynamic-labs/ethers-v6";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
+import { CV__factory } from "@/typechain";
+import SEPOLIA_CONTRACTS from "@/configs/sepolia";
+import { parseUnits } from "ethers/utils";
 
 interface Token {
   name: string;
+  symbol: string;
   amount: string;
   value: string;
   icon: string;
@@ -15,15 +21,59 @@ const TokenListPage = () => {
   const router = useRouter();
   const [selectedToken, setSelectedToken] = useState<Token | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isApproved, setIsApproved] = useState(false);
+  const { primaryWallet } = useDynamicContext();
 
-  const tokens: Token[] = [
-    { name: "Bitcoin", amount: "0.1 BTC", value: "$6,000", icon: "/icons/bitcoin.png", hasAccess: true },
-    { name: "Ethereum", amount: "0.1 ETH", value: "$3,000", icon: "/icons/ethereum.png", hasAccess: true },
-    { name: "XRPL", amount: "0.1 CVT", value: "$3,000", icon: "/icons/cryptovest.png", hasAccess: false },
-    { name: "Dogecoin", amount: "0.1 DOGE", value: "$3,000", icon: "/icons/dogecoin.png", hasAccess: false },
-    { name: "Solana", amount: "0.1 SOL", value: "$3,000", icon: "/icons/solana.png", hasAccess: false },
-    { name: "Cardano", amount: "0.1 ADA", value: "$3,000", icon: "/icons/cardano.png", hasAccess: false },
-  ];
+  const [tokens, setTokens] = useState<Token[]>([
+    {
+      name: "Bitcoin",
+      symbol: "BTC",
+      amount: "0.1 BTC",
+      value: "2",
+      icon: "/icons/bitcoin.png",
+      hasAccess: true,
+    },
+    {
+      name: "Ethereum",
+      symbol: "ETH",
+      amount: "0.1 ETH",
+      value: "2",
+      icon: "/icons/ethereum.png",
+      hasAccess: true,
+    },
+    {
+      name: "XRPL",
+      symbol: "XRP",
+      amount: "0.1 CVT",
+      value: "2",
+      icon: "/icons/cryptovest.png",
+      hasAccess: false,
+    },
+    {
+      name: "Dogecoin",
+      symbol: "DOGE",
+      amount: "0.1 DOGE",
+      value: "2",
+      icon: "/icons/dogecoin.png",
+      hasAccess: false,
+    },
+    {
+      name: "Solana",
+      symbol: "SOL",
+      amount: "0.1 SOL",
+      value: "2",
+      icon: "/icons/solana.png",
+      hasAccess: false,
+    },
+    {
+      name: "Cardano",
+      symbol: "ADA",
+      amount: "0.1 ADA",
+      value: "2",
+      icon: "/icons/cardano.png",
+      hasAccess: false,
+    },
+  ]);
 
   const handleTokenClick = (token: Token) => {
     if (token.hasAccess) {
@@ -37,6 +87,40 @@ const TokenListPage = () => {
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedToken(null);
+    setIsApproved(false);
+  };
+
+  const onApprove = async () => {
+    const signer = await getSigner(primaryWallet!);
+
+    const cv = CV__factory.connect(
+      SEPOLIA_CONTRACTS.CV,
+      signer,
+    );
+    const tx = await cv.approve(SEPOLIA_CONTRACTS.CV, parseUnits(selectedToken!.value, 6));
+    await tx.wait();
+    setIsApproved(true);
+  };
+
+  const onConfirm = async () => {
+    const signer = await getSigner(primaryWallet!);
+
+    const cv = CV__factory.connect(
+      SEPOLIA_CONTRACTS.CV,
+      signer,
+    );
+
+    const tx = await cv.subscribe(selectedToken!.symbol);
+    await tx.wait();
+    setTokens((prevTokens) =>
+      prevTokens.map((token) =>
+        token.name === selectedToken!.name
+          ? { ...token, hasAccess: true }
+          : token
+      )
+    );
+
+    closeModal();
   };
 
   return (
@@ -56,7 +140,11 @@ const TokenListPage = () => {
             }`}
             onClick={() => handleTokenClick(token)}
           >
-            <img src={token.icon} alt={token.name} className="w-10 h-10 rounded" />
+            <img
+              src={token.icon}
+              alt={token.name}
+              className="w-10 h-10 rounded"
+            />
             <div>
               <h3 className="font-medium">{token.name}</h3>
               <p className="text-sm text-gray-400">
@@ -73,33 +161,52 @@ const TokenListPage = () => {
       {/* 모달 */}
       {isModalOpen && selectedToken && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div 
+          <div
             className="absolute bg-gray-900 p-8 rounded shadow-lg max-w-2xl w-full"
-            style={{top: "10%"}}
+            style={{ top: "10%" }}
           >
-            <h2 className="text-xl font-semibold text-white mb-4">Unlock detailed charts</h2>
+            <h2 className="text-xl font-semibold text-white mb-4">
+              Unlock detailed charts
+            </h2>
             <p className="text-gray-400 mb-4">
-              Get access to our in-depth charting tools by purchasing $1,000 CV Tokens.
+              Get access to our in-depth charting tools by purchasing $1,000 CV
+              Tokens.
             </p>
             <div className="mb-6">
               <div className="flex items-center gap-4 mb-4">
                 <div className="bg-gray-800 p-4 rounded">
-                  <img src="/icons/wallet.png" alt="Wallet Icon" className="w-8 h-8" />
+                  <img
+                    src="/icons/wallet.png"
+                    alt="Wallet Icon"
+                    className="w-8 h-8"
+                  />
                 </div>
                 <div>
                   <p className="text-gray-300">Token Balance</p>
-                  <p className="text-sm text-gray-400">Your current balance is 0 CV Tokens</p>
-                  <p className="text-sm text-gray-500">You will be charged 1,000 $CV Token</p>
-                  <p className="text-sm text-gray-500">Subscription Period: 24.09.01 ~ 24.10.01</p>
+                  <p className="text-sm text-gray-400">
+                    Your current balance is 0 CV Tokens
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    You will be charged 1,000 $CV Token
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    Subscription Period: 24.09.01 ~ 24.10.01
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-4">
                 <div className="bg-gray-800 p-4 rounded">
-                  <img src="/icons/lock.png" alt="Lock Icon" className="w-8 h-8" />
+                  <img
+                    src="/icons/lock.png"
+                    alt="Lock Icon"
+                    className="w-8 h-8"
+                  />
                 </div>
                 <div>
                   <p className="text-gray-300">Chart Access</p>
-                  <p className="text-sm text-gray-400">This will unlock detailed charts for 1 year</p>
+                  <p className="text-sm text-gray-400">
+                    This will unlock detailed charts for 1 year
+                  </p>
                 </div>
               </div>
             </div>
@@ -110,12 +217,21 @@ const TokenListPage = () => {
               >
                 Close
               </button>
-              <button
-                className="bg-white px-4 py-2 w-full rounded text-black hover:bg-gray-200"
-                onClick={closeModal}
-              >
-                Confirm Purchase
-              </button>
+              {!isApproved ? (
+                <button
+                  className="bg-white px-4 py-2 w-full rounded text-black hover:bg-gray-200"
+                  onClick={onApprove}
+                >
+                  Approve Purchase
+                </button>
+              ) : (
+                <button
+                  className="bg-white px-4 py-2 w-full rounded text-black hover:bg-gray-200"
+                  onClick={onConfirm}
+                >
+                  Confirm Purchase
+                </button>
+              )}
             </div>
           </div>
         </div>
