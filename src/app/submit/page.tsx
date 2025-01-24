@@ -8,22 +8,14 @@ import { getSigner } from "@dynamic-labs/ethers-v6";
 import SEPOLIA_CONTRACTS from "@/configs/sepolia";
 import { CV__factory } from "@/typechain";
 import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
-
-// Opinion 타입 정의
-interface Opinion {
-  id: number;
-  cause: string;
-  effect: string;
-  content: string;
-  sourceType: string;
-  link: string;
-}
+import { Opinion } from "@/states/opinions.state";
 
 const SubmitForm = () => {
   const router = useRouter();
   const { primaryWallet } = useDynamicContext();
   const [formData, setFormData] = useState<Opinion>({
     id: 0,
+    coin: "",
     cause: "",
     effect: "",
     content: "",
@@ -71,6 +63,18 @@ const SubmitForm = () => {
     <Container>
       <Form onSubmit={handleSubmit}>
         <Heading>Submit your opinion</Heading>
+
+        <InputGroup>
+          <Label htmlFor="Coin">Coin</Label>
+          <Input
+            type="text"
+            id="Coin"
+            name="Coin"
+            value={formData.coin}
+            onChange={handleInputChange}
+            placeholder="Enter Coin name"
+          />
+        </InputGroup>
 
         <InputGroup>
           <Label>Source Type</Label>
@@ -122,6 +126,26 @@ const SubmitForm = () => {
             value={formData.content}
             onChange={handleInputChange}
             placeholder="Enter content"
+          />
+        </InputGroup>
+
+        {/* 시작 시각 입력 필드 */}
+        <InputGroup>
+          <Label htmlFor="startTime">Start Time</Label>
+          <Input
+            type="datetime-local"
+            id="startTime"
+            name="startTime"
+          />
+        </InputGroup>
+
+        {/* 종료 시각 입력 필드 */}
+        <InputGroup>
+          <Label htmlFor="endTime">End Time</Label>
+          <Input
+            type="datetime-local"
+            id="endTime"
+            name="endTime"
           />
         </InputGroup>
 
