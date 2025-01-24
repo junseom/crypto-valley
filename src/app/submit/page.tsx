@@ -65,11 +65,11 @@ const SubmitForm = () => {
         <Heading>Submit your opinion</Heading>
 
         <InputGroup>
-          <Label htmlFor="Coin">Coin</Label>
+          <Label htmlFor="coin">Coin</Label>
           <Input
             type="text"
-            id="Coin"
-            name="Coin"
+            id="coin"
+            name="coin"
             value={formData.coin}
             onChange={handleInputChange}
             placeholder="Enter Coin name"
