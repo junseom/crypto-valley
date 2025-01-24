@@ -64,7 +64,8 @@ const DynamicChartPage = () => {
           {newsData.map((item, index) => (
             <li key={index} className="p-4 bg-gray-800 rounded">
               <h3 className="font-semibold">{item.title}</h3>
-              <p className="text-sm text-gray-400">{item.time}</p>
+              <p className="text-sm text-gray-400">{item.content}</p>
+              <p className="text-sm text-gray-400">{item.date}</p>
             </li>
           ))}
         </ul>
