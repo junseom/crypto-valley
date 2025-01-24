@@ -99,6 +99,15 @@ const TokenListPage = () => {
     );
     const tx = await cv.approve(SEPOLIA_CONTRACTS.CV, parseUnits(selectedToken!.value, 6));
     await tx.wait();
+    setTokens((prevTokens) =>
+      prevTokens.map((token) =>
+        token.name === selectedToken!.name
+          ? { ...token, hasAccess: true }
+          : token
+      )
+    );
+
+    closeModal();
     setIsApproved(true);
   };
 

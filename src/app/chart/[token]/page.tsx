@@ -93,13 +93,16 @@ const DynamicChartPage = () => {
       <div className="w-1/4 p-4 bg-gray-900 overflow-auto">
         <h2 className="text-lg font-bold mb-4">News</h2>
         <ul className="space-y-4">
-          {newsData.map((item, index) => (
-            <li key={index} className="p-4 bg-gray-800 rounded">
-              <h3 className="font-semibold">{item.title}</h3>
-              <p className="text-sm text-gray-400">{item.content}</p>
-              <p className="text-sm text-gray-400">{item.date}</p>
-            </li>
-          ))}
+        {newsData.map((item, index) => (
+  item.coin === symbol && (
+    <li key={index} className="p-4 bg-gray-800 rounded">
+      <h3 className="font-semibold">{item.title}</h3>
+      <p className="text-sm text-gray-400">{item.content}</p>
+      <p className="text-sm text-gray-400">{item.date}</p>
+    </li>
+  )
+))}
+
         </ul>
       </div>
 
@@ -130,27 +133,27 @@ const DynamicChartPage = () => {
           </div>
 
           {/* 툴팁 */}
-          {hoveredPosition && randomOpinion && (
-            <div
-              className="absolute bg-gray-800 text-white text-sm p-4 rounded shadow-lg max-w-xl"
-              style={{
-                top: `${getTooltipPosition(hoveredPosition.x, hoveredPosition.y).y}px`,
-                left: `${getTooltipPosition(hoveredPosition.x, hoveredPosition.y).x}px`,
-                transform: "translate(-50%, -10px)",
-                pointerEvents: "none",
-              }}
-            >
-              <p>
-                <strong>Cause:</strong> {randomOpinion.cause}
-              </p>
-              <p>
-                <strong>Effect:</strong> {randomOpinion.effect}
-              </p>
-              <p>
-                <strong>Content:</strong> {randomOpinion.content}
-              </p>
-            </div>
-          )}
+          {hoveredPosition && randomOpinion && randomOpinion.coin === symbol && (
+  <div
+    className="absolute bg-gray-800 text-white text-sm p-4 rounded shadow-lg max-w-xl"
+    style={{
+      top: `${getTooltipPosition(hoveredPosition.x, hoveredPosition.y).y}px`,
+      left: `${getTooltipPosition(hoveredPosition.x, hoveredPosition.y).x}px`,
+      transform: "translate(-50%, -10px)",
+      pointerEvents: "none",
+    }}
+  >
+    <p>
+      <strong>Cause:</strong> {randomOpinion.cause}
+    </p>
+    <p>
+      <strong>Effect:</strong> {randomOpinion.effect}
+    </p>
+    <p>
+      <strong>Content:</strong> {randomOpinion.content}
+    </p>
+  </div>
+)}
         </div>
       </div>
     </div>

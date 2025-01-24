@@ -3,6 +3,7 @@ import { Opinion } from "./opinions.state";
 export const mockOpinionsData: Opinion[] = [
   {
     id: 0,
+    coin: "BITCOIN",
     cause: "6-day net inflow of $189.09 million into U.S. Bitcoin spot ETFs signals strong investor confidence.",
     effect: "Increased buying pressure pushed Bitcoin prices higher, with potential for short-term corrections.",
     content:
@@ -12,6 +13,7 @@ export const mockOpinionsData: Opinion[] = [
   },
   {
     id: 1,
+    coin: "BITCOIN",
     cause: "Changpeng Zhao stated the U.S. likely holds Bitcoin as a strategic asset reserve.",
     effect: "This increased speculation and boosted Bitcoin market confidence.",
     content:
@@ -21,6 +23,7 @@ export const mockOpinionsData: Opinion[] = [
   },
   {
     id: 2,
+    coin: "DOGECOIN",
     cause: "Bitwise registered a Dogecoin trust in Delaware, clarified as not an official ETF filing.",
     effect: "Generated interest but minimal market impact due to the lack of formal ETF approval.",
     content:
@@ -30,6 +33,7 @@ export const mockOpinionsData: Opinion[] = [
   },
   {
     id: 3,
+    coin: "DOGECOIN",
     cause: "Radin suggested that a crypto-friendly SEC under Trump increases memecoin ETF approval chances.",
     effect: "The statement raised optimism and interest in memecoin ETFs.",
     content:
@@ -39,6 +43,7 @@ export const mockOpinionsData: Opinion[] = [
   },
   {
     id: 4,
+    coin: "DOGECOIN",
     cause: "DOGE experienced a 46% correction, similar to a past 56% correction.",
     effect: "An uptrend in DOGE is expected to begin as early as next week",
     content:

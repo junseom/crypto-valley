@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 export interface Opinion {
   id: number;
+  coin: string;
   cause: string;
   effect: string;
   content: string;
